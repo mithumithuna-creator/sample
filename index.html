@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration & Results</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #11111a 0%, #161a2b 100%);
+            color: #e9edf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(97, 79, 255, 0.18), transparent 24%),
+                        radial-gradient(circle at bottom right, rgba(255, 88, 133, 0.14), transparent 22%);
+            pointer-events: none;
+        }
+
+        .box {
+            width: min(100%, 520px);
+            background: rgba(15, 18, 38, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+            position: relative;
+            z-index: 1;
+        }
+
+        .box h2 {
+            margin: 0 0 24px;
+            font-size: clamp(2rem, 2.2vw, 2.4rem);
+            color: #ffffff;
+            text-align: center;
+            letter-spacing: 0.8px;
+        }
+
+        .box label {
+            display: block;
+            margin-bottom: 10px;
+            color: #b2b9d5;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .box input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #f5f7ff;
+            font-size: 1rem;
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+
+        .box input:focus {
+            outline: none;
+            border-color: rgba(91, 125, 255, 0.65);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .box button {
+            width: 100%;
+            padding: 16px 0;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #5b7dff, #ff6399);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(91, 125, 255, 0.24);
+        }
+
+        .box button:active {
+            transform: translateY(0);
+        }
+
+        .result-box {
+            width: min(100%, 820px);
+            background: rgba(15, 18, 38, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(91, 126, 255, 0.35), rgba(255, 67, 150, 0.35));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .result-box h2 {
+            margin: 0 0 28px;
+            font-size: clamp(2rem, 2.5vw, 2.8rem);
+            text-align: center;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .student-details p {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .student-details b {
+            display: block;
+            color: #9eaacf;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .student-details span {
+            display: block;
+            color: #f8fbff;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+        }
+
+        th,
+        td {
+            padding: 18px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        th {
+            color: #b9c2dc;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        td {
+            color: #f4f7ff;
+            font-size: 1rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            font-size: 0.95rem;
+        }
+
+        .pass {
+            background: rgba(77, 179, 79, 0.16);
+            color: #72d578;
+        }
+
+        .fail {
+            background: rgba(255, 83, 85, 0.16);
+            color: #ff8b90;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 32px auto 0;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #5b7dff, #ff6399);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            width: fit-content;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(91, 125, 255, 0.24);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 20px;
+            }
+
+            .result-box {
+                padding: 24px;
+            }
+
+            .student-details {
+                grid-template-columns: 1fr;
+            }
+
+            th,
+            td {
+                padding: 14px 12px;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- REGISTRATION PAGE -->
+<div id="registerPage" class="box">
+    <h2>Student Registration</h2>
+
+    <label>Register Number</label>
+    <input type="text" id="regno" placeholder="Enter Register Number">
+
+    <label>Name</label>
+    <input type="text" id="name" placeholder="Enter Name">
+
+    <label>Date of Birth</label>
+    <input type="date" id="dob">
+
+    <button onclick="registerStudent()">Register</button>
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="result-box hidden">
+    <h2>Tamil Nadu Result</h2>
+
+    <div class="student-details">
+        <p>
+            <b>Register Number :</b>
+            <span id="dispRegno"></span>
+        </p>
+
+        <p>
+            <b>Name :</b>
+            <span id="dispName"></span>
+        </p>
+
+        <p>
+            <b>Date of Birth :</b>
+            <span id="dispDob"></span>
+        </p>
+    </div>
+
+    <table>
+        <tr>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Result</th>
+        </tr>
+
+        <tr>
+            <td>Tamil</td>
+            <td id="tamil"></td>
+            <td id="tamilResult"></td>
+        </tr>
+
+        <tr>
+            <td>English</td>
+            <td id="english"></td>
+            <td id="englishResult"></td>
+        </tr>
+
+        <tr>
+            <td>Mathematics</td>
+            <td id="maths"></td>
+            <td id="mathsResult"></td>
+        </tr>
+
+        <tr>
+            <td>Science</td>
+            <td id="science"></td>
+            <td id="scienceResult"></td>
+        </tr>
+
+        <tr>
+            <td>Social Science</td>
+            <td id="social"></td>
+            <td id="socialResult"></td>
+        </tr>
+    </table>
+
+    <button class="back-btn" onclick="backToRegister()">Back to Register</button>
+</div>
+
+<script>
+    // Student database with 5 students
+    let students = {
+        "101": {
+            name: "MITHUNA",
+            dob: "2002-05-10",
+            tamil: 80,
+            english: 65,
+            maths: 30,
+            science: 75,
+            social: 90
+        },
+        "102": {
+            name: "KEERTHANA",
+            dob: "2002-06-15",
+            tamil: 70,
+            english: 80,
+            maths: 55,
+            science: 60,
+            social: 88
+        },
+        "103": {
+            name: "PRADEEPA",
+            dob: "2002-08-20",
+            tamil: 90,
+            english: 92,
+            maths: 85,
+            science: 78,
+            social: 95
+        },
+        "104": {
+            name: "ABARNA",
+            dob: "2002-03-12",
+            tamil: 35,
+            english: 45,
+            maths: 28,
+            science: 60,
+            social: 50
+        },
+        "105": {
+            name: "ATCHAYA",
+            dob: "2002-11-05",
+            tamil: 88,
+            english: 76,
+            maths: 91,
+            science: 84,
+            social: 79
+        }
+    };
+
+    // Register function
+    function registerStudent() {
+        let regno = document.getElementById("regno").value.trim();
+        let name = document.getElementById("name").value.trim();
+        let dob = document.getElementById("dob").value;
+
+        if (regno === "" || name === "" || dob === "") {
+            alert("Please fill all details");
+            return;
+        }
+
+        let student = students[regno];
+
+        if (!student) {
+            alert("Register Number not found!");
+            return;
+        }
+
+        if (student.name.toUpperCase() !== name.toUpperCase() || student.dob !== dob) {
+            alert("Register Number, Name and Date of Birth do not match the student record!");
+            return;
+        }
+
+        // Save data to localStorage
+        localStorage.setItem("regno", regno);
+        localStorage.setItem("name", student.name);
+        localStorage.setItem("dob", student.dob);
+        localStorage.setItem("studentMarks", JSON.stringify(student));
+
+        // Show result page
+        showResultPage();
+    }
+
+    // Show result page
+    function showResultPage() {
+        document.getElementById("registerPage").classList.add("hidden");
+        document.getElementById("resultPage").classList.remove("hidden");
+        localStorage.setItem("showResult", "true");
+
+        let regno = localStorage.getItem("regno");
+        let name = localStorage.getItem("name");
+        let dob = localStorage.getItem("dob");
+        let marks = JSON.parse(localStorage.getItem("studentMarks"));
+
+        // Display student details
+        document.getElementById("dispRegno").innerText = regno;
+        document.getElementById("dispName").innerText = name;
+        document.getElementById("dispDob").innerText = dob;
+
+        // Display marks
+        document.getElementById("tamil").innerText = marks.tamil;
+        document.getElementById("english").innerText = marks.english;
+        document.getElementById("maths").innerText = marks.maths;
+        document.getElementById("science").innerText = marks.science;
+        document.getElementById("social").innerText = marks.social;
+
+        // Check results for each subject
+        checkResult(marks.tamil, "tamilResult");
+        checkResult(marks.english, "englishResult");
+        checkResult(marks.maths, "mathsResult");
+        checkResult(marks.science, "scienceResult");
+        checkResult(marks.social, "socialResult");
+    }
+
+    // Check pass/fail (35 or above = PASS, Below 35 = FAIL)
+    function checkResult(mark, elementId) {
+        let result = document.getElementById(elementId);
+
+        if (mark >= 35) {
+            result.innerText = "PASS";
+            result.className = "pass";
+        } else {
+            result.innerText = "FAIL";
+            result.className = "fail";
+        }
+    }
+
+    // Back to register button
+    function backToRegister() {
+        document.getElementById("registerPage").classList.remove("hidden");
+        document.getElementById("resultPage").classList.add("hidden");
+        localStorage.setItem("showResult", "false");
+        
+        // Clear form
+        document.getElementById("regno").value = "";
+        document.getElementById("name").value = "";
+        document.getElementById("dob").value = "";
+    }
+
+    // Always start on the registration page and only switch after a valid registration
+    window.addEventListener('load', function() {
+        document.getElementById("registerPage").classList.remove("hidden");
+        document.getElementById("resultPage").classList.add("hidden");
+        localStorage.setItem("showResult", "false");
+    });
+</script>
+
+</body>
+
+</html>
